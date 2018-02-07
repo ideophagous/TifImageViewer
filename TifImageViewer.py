@@ -8,8 +8,10 @@ class TifImageViewer(wx.App):
         #wx.InitAllImageHandlers()
         self.createMenuBar()
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.panel, 10, wx.EXPAND|wx.ALL, 2)
+        sizer.Add(self.panel, 1, wx.EXPAND|wx.ALL, 2)
         self.frame.SetSizer(sizer)
+        self.frame.CreateStatusBar()
+        self.frame.SetStatusText("Made for Delmic")
         self.frame.Show()
 
     def createMenuBar(self):
@@ -61,6 +63,7 @@ class TifImageViewer(wx.App):
 class myPanel(wx.Panel):
     def __init__(self,filename,frame):
         super(myPanel,self).__init__(frame)
+        self.sizer = wx.GridBagSizer(5,5)
         if(filename!=None):
             try:
                 
@@ -69,6 +72,8 @@ class myPanel(wx.Panel):
                                              wx.Bitmap(self.image))
                 W,H = self.GetSize()
                 self.image.Scale(W,H)
+                self.sizer.Add(self.imageCtrl,pos=(0,0),span=(5,5), flag=wx.EXPAND|wx.ALL, border=2)
+                self.SetSizer(self.sizer)
                 
             except Exception,e:
                 print(str(e))
