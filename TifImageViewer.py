@@ -12,6 +12,8 @@ class TifImageViewer(wx.App):
         self.frame.SetSizer(sizer)
         self.frame.CreateStatusBar()
         self.frame.SetStatusText("Made for Delmic")
+        print(self.frame.GetSize())
+        print(self.panel.GetSize())
         self.frame.Show()
 
     def createMenuBar(self):
@@ -56,6 +58,7 @@ class TifImageViewer(wx.App):
         ofd = openFileDialog.ShowModal()
         if ofd == wx.ID_OK:
             self.panel = myPanel(openFileDialog.GetPath(),self.frame)
+            
         
         openFileDialog.Destroy()
         
@@ -70,7 +73,8 @@ class myPanel(wx.Panel):
                 self.image = wx.Image(filename,wx.BITMAP_TYPE_ANY)
                 self.imageCtrl = wx.StaticBitmap(self, wx.ID_ANY, 
                                              wx.Bitmap(self.image))
-                W,H = self.GetSize()
+                W,H = frame.GetSize()
+                self.SetSize((W,H))
                 self.image.Scale(W,H)
                 self.sizer.Add(self.imageCtrl,pos=(0,0),span=(5,5), flag=wx.EXPAND|wx.ALL, border=2)
                 self.SetSizer(self.sizer)
@@ -83,3 +87,4 @@ class myPanel(wx.Panel):
 if __name__ == '__main__':
     imageViewer = TifImageViewer()
     imageViewer.MainLoop()
+    
