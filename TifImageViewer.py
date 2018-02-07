@@ -57,6 +57,7 @@ class TifImageViewer(wx.App):
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         ofd = openFileDialog.ShowModal()
         if ofd == wx.ID_OK:
+            self.panel.Destroy()
             self.panel = myPanel(openFileDialog.GetPath(),self.frame)
             
         
@@ -71,13 +72,25 @@ class myPanel(wx.Panel):
             try:
                 
                 self.image = wx.Image(filename,wx.BITMAP_TYPE_ANY)
-                self.imageCtrl = wx.StaticBitmap(self, wx.ID_ANY, 
-                                             wx.Bitmap(self.image))
+                
                 W,H = frame.GetSize()
                 self.SetSize((W,H))
-                self.image.Scale(W,H)
+                IW,IH = self.image.GetSize()
+                if(IH<IW):
+                    IP = W/float(IW)
+                    self.image.Rescale(W,IH*IP)
+                else:
+                    IP = H/float(IH)
+                    self.image.Rescale(IW*IP,H)
+                
+                print(self.image.GetSize())
+                self.imageCtrl = wx.StaticBitmap(self, wx.ID_ANY, 
+                                             wx.Bitmap(self.image))
                 self.sizer.Add(self.imageCtrl,pos=(0,0),span=(5,5), flag=wx.EXPAND|wx.ALL, border=2)
                 self.SetSizer(self.sizer)
+                sizer = wx.BoxSizer(wx.VERTICAL)
+                sizer.Add(self, 1, wx.EXPAND|wx.ALL, 2)
+                frame.SetSizer(sizer)
                 
             except Exception,e:
                 print(str(e))
