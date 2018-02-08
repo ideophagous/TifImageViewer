@@ -9,13 +9,9 @@ To execute this program, simply:
 3. Select a file
 4. Click 'Open'
 
-Either the image will appear on the window
-or an error message box will appear if the file 
-extension or format is incorrect.
+Either the image will appear on the window or an error message box will appear if the file extension or format is incorrect.
 
-The application can handle the extensions jpg, 
-jpeg, tif, tiff, or png. Other formats have
-not been tested and cannot be guaranteed to work.
+The application can handle the extensions jpg, jpeg, tif, tiff (8-bit and 16-bit formats), and png, with good reliability. ico and bmp files can also be viewed, but these two extensions have not been tested sufficiently. Other formats have not been tested and cannot be guaranteed to work.
 
 Requirements: wx (wxPython), cv2 (OpenCV), numpy, os
 
