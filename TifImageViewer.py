@@ -21,9 +21,6 @@ class ImageViewerFrame(wx.Frame):
         
 
     def createMenuBar(self):
-        """
-        A menu bar for our frame
-        """
         
         fileMenu = wx.Menu()
         openItem = fileMenu.Append(-1,"&Open...\tCtrl-J",
@@ -56,7 +53,7 @@ class ImageViewerFrame(wx.Frame):
                       "\n\nDate: Feb 08, 2018")
 
     def onOpenFile(self,event):
-        wildcard = "All files (*.*) | *.*|(*.jpg)|*.jpg|(*.png)|*.png|(*.tif)|*.tif|(*.tiff)|*.tiff"
+        wildcard = "All files (*.*) | *.*|(*.jpg)|*.jpg|(*.tif)|*.tif|(*.tiff)|*.tiff"
         openFileDialog = wx.FileDialog(self, "Open", "", "", 
                                        wildcard, 
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
@@ -82,23 +79,31 @@ class ImageViewerFrame(wx.Frame):
 class myPanel(wx.Panel):
     def __init__(self,filename,frame):
         super(myPanel,self).__init__(frame)
-        
+
         self.filename = filename
-        frame_width,frame_height = frame.GetSize()
-        self.SetSize((frame_width,frame_height))
+        self.SetSize(frame.GetSize())
+        self.build_image()
+
+    def build_image(self):
         if(self.filename is not None):
             try:
-                extension = self.filename.split('.')[-1]
-                #we bypass the issue of TIF images by converting the image
-                #to a temporary jpg file
-                if(extension.lower() in ['tiff','tif']):
+                extension = self.filename.split('.')[-1].lower()
+                if(extension not in ['tiff','tif','jpg','jpeg','png']):
+                    wx.MessageBox("Bad file format! This applications handles only JPG, PNG and TIF images at the moment!",
+                                  '',wx.ICON_ERROR)
+
+                elif(extension in ['tiff','tif','png']):
+                    '''we bypass the issue of TIF and PNG images by converting the image
+                    to a temporary jpg file. Other image extensions can be added as long
+                    as they are readable by OpenCV and can be converted to jpg format.
+                    '''
                     im = cv2.imread(self.filename).astype(np.uint8)
                     cv2.imwrite('temp.jpg', im)
                     self.filename = 'temp.jpg'
-                
+
                 self.image = wx.Image(self.filename,wx.BITMAP_TYPE_ANY)
                 
-                image_width,image_height = get_new_image_size(self.image.GetSize(),frame.GetSize())
+                image_width,image_height = get_new_image_size(self.image.GetSize(),self.GetSize())
                 self.image.Rescale(image_width,image_height)
                 
                 self.image_control = wx.StaticBitmap(self, wx.ID_ANY, 
