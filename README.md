@@ -10,8 +10,8 @@ To execute this program, simply:
 
 Either the image will appear on the window
 or an error message box will appear if the file 
-extension or format is incorrect
+extension or format is incorrect.
 
 The application can handle the extensions jpg, 
 jpeg, tif, tiff, or png. Other formats have
-not been tested and cannot be guaranteed
+not been tested and cannot be guaranteed to work.
