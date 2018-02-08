@@ -1,4 +1,5 @@
 Made by Mounir AFIFI for a job interview at Delmic, Netherlands
+
 Python 2.7.12
 
 To execute this program, simply:
@@ -20,5 +21,6 @@ Requirements: wx (wxPython), cv2 (OpenCV), numpy, os
 
 This code was developed with the help of Tutorial Point
 https://www.tutorialspoint.com/wxpython/index.htm
+
 As well as some answers on StackExchange
 https://stackexchange.com/
