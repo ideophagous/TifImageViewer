@@ -30,6 +30,7 @@ class ImageViewerFrame(wx.Frame):
         exitItem = fileMenu.Append(wx.ID_EXIT)
 
         helpMenu = wx.Menu()
+        instructionsItem = helpMenu.Append(wx.ID_HELP)
         aboutItem = helpMenu.Append(wx.ID_ABOUT)
 
         menuBar = wx.MenuBar()
@@ -41,6 +42,7 @@ class ImageViewerFrame(wx.Frame):
         self.Bind(wx.EVT_MENU,self.onExit,exitItem)
         self.Bind(wx.EVT_MENU,self.onAbout,aboutItem)
         self.Bind(wx.EVT_MENU,self.onOpenFile,openItem)
+        self.Bind(wx.EVT_MENU,self.onHelp,instructionsItem)
         
 
     def onExit(self,event):
@@ -61,9 +63,28 @@ class ImageViewerFrame(wx.Frame):
         if modal == wx.ID_OK:
             self.panel.Destroy()
             self.panel = myPanel(openFileDialog.GetPath(),self)
-            
         
         openFileDialog.Destroy()
+
+    def onHelp(self,event):
+        wx.MessageBox('''
+                        To view an image, simply:
+
+                        1. Go to File -> Open... and click
+                        2. Select a file
+                        3. Click 'Open'
+
+                        Either the image will appear on the
+                        window or an error message box will
+                        appear if the file extension or
+                        format is incorrect.
+
+                        The application can handle the
+                        extensions jpg, jpeg, tif, tiff, or
+                        png. Other formats have not been
+                        tested and cannot be guaranteed to
+                        work.
+                    ''')
 
     def onResize(self, event):
                 
