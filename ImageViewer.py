@@ -122,6 +122,7 @@ class myPanel(wx.Panel):
                     cv2.imwrite('temp.jpg', im)
                     self.filename = 'temp.jpg'
 
+                
                 self.image = wx.Image(self.filename,wx.BITMAP_TYPE_ANY)
                 
                 image_width,image_height = get_new_image_size(self.image.GetSize(),self.GetSize())
