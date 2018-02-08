@@ -1,20 +1,15 @@
 import wx
+import cv2
+import numpy as np
+import os
 
 class TifImageViewer(wx.App):
     def __init__(self,redirect=False, filename=None):
         super(TifImageViewer,self).__init__(redirect,filename)
-        self.frame = wx.Frame(None,title="Tif Image Viewer")
-        self.panel = myPanel(None,self.frame)
+        self.frame = myFrame(None,title="Tif Image Viewer")
         #wx.InitAllImageHandlers()
         self.createMenuBar()
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.panel, 1, wx.EXPAND|wx.ALL, 2)
-        self.frame.SetSizer(sizer)
-        self.frame.CreateStatusBar()
-        self.frame.SetStatusText("Made for Delmic")
-        print(self.frame.GetSize())
-        print(self.panel.GetSize())
-        self.frame.Show()
+        
 
     def createMenuBar(self):
         """
@@ -40,6 +35,7 @@ class TifImageViewer(wx.App):
         self.Bind(wx.EVT_MENU,self.onExit,exitItem)
         self.Bind(wx.EVT_MENU,self.onAbout,aboutItem)
         self.Bind(wx.EVT_MENU,self.onOpenFile,openItem)
+        
 
     def onExit(self,event):
         self.frame.Close(True)
@@ -51,27 +47,62 @@ class TifImageViewer(wx.App):
                       "\n\nDate: Jan 31, 2018")
 
     def onOpenFile(self,event):
-        wildcard = "Image files (*.jpg)|*.jpg|(*.png)|*.png|(*.tif)|*.tif|(*.tiff)|*.tiff"
+        wildcard = "All files (*.*) | *.*|Image files (*.jpg)|*.jpg|(*.png)|*.png|(*.tif)|*.tif|(*.tiff)|*.tiff"
         openFileDialog = wx.FileDialog(self.frame, "Open", "", "", 
                                        wildcard, 
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         ofd = openFileDialog.ShowModal()
         if ofd == wx.ID_OK:
-            self.panel.Destroy()
-            self.panel = myPanel(openFileDialog.GetPath(),self.frame)
+            self.frame.panel.Destroy()
+            self.frame.panel = myPanel(openFileDialog.GetPath(),self.frame)
             
         
         openFileDialog.Destroy()
+
+    
         
+class myFrame(wx.Frame):
+    def __init__(self,value,title):
+        super(myFrame,self).__init__(None,title="Tif Image Viewer")
+        self.panel = myPanel(None,self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.panel, 1, wx.EXPAND|wx.ALL, 2)
+        self.SetSizer(sizer)
+        self.CreateStatusBar()
+        self.SetStatusText("Made for Delmic")
+        
+        self.Show()
+
+        self.Bind(wx.EVT_SIZE, self.onResize)
+    
+    def onResize(self, event):
+                
+        try:
+            f = self.panel.filename
+            self.panel.Hide()
+            self.panel = myPanel(f,self)
+        except Exception,e:
+            print(str(e))
+        
+        
+        self.Refresh()
+        self.Layout()
+    
 
 class myPanel(wx.Panel):
     def __init__(self,filename,frame):
         super(myPanel,self).__init__(frame)
         self.sizer = wx.GridBagSizer(5,5)
-        if(filename!=None):
+        self.filename = filename
+        
+        if(self.filename!=None):
             try:
-                
-                self.image = wx.Image(filename,wx.BITMAP_TYPE_ANY)
+                extension = self.filename.split('.')[-1]
+                if(extension in ['tiff','tif','TIF','TIFF']):
+                    im = cv2.imread(self.filename).astype(np.uint8)
+                    cv2.imwrite('temp.jpg', im)
+                    self.filename = 'temp.jpg'
+                self.image = wx.Image(self.filename,wx.BITMAP_TYPE_ANY)
                 
                 W,H = frame.GetSize()
                 self.SetSize((W,H))
@@ -83,7 +114,6 @@ class myPanel(wx.Panel):
                     IP = H/float(IH)
                     self.image.Rescale(IW*IP,H)
                 
-                print(self.image.GetSize())
                 self.imageCtrl = wx.StaticBitmap(self, wx.ID_ANY, 
                                              wx.Bitmap(self.image))
                 self.sizer.Add(self.imageCtrl,pos=(0,0),span=(5,5), flag=wx.EXPAND|wx.ALL, border=2)
@@ -94,6 +124,7 @@ class myPanel(wx.Panel):
                 
             except Exception,e:
                 print(str(e))
+        #os.remove('temp.jpg')
     
         
 
