@@ -3,13 +3,13 @@ import cv2
 import numpy as np
 import os
 
-class TifImageViewer(wx.App):
+class ImageViewer(wx.App):
     def __init__(self,redirect=False, filename=None):
-        super(TifImageViewer,self).__init__(redirect,filename)
-        self.frame = myFrame(None,title="Tif Image Viewer")
-        #wx.InitAllImageHandlers()
-        self.createMenuBar()
+        super(ImageViewer,self).__init__(redirect,filename)
         
+        self.frame = myFrame(None,title="Image Viewer")
+        
+        self.createMenuBar()
 
     def createMenuBar(self):
         """
@@ -41,13 +41,13 @@ class TifImageViewer(wx.App):
         self.frame.Close(True)
 
     def onAbout(self,event):
-        #print(help(wx.MessageBox))
+        
         wx.MessageBox("About"+"\n\nImage Viewer developed by Mounir AFIFI for Delmic"
                       +"\n\nPython version: 2.7.12"+
-                      "\n\nDate: Jan 31, 2018")
+                      "\n\nDate: Feb 08, 2018")
 
     def onOpenFile(self,event):
-        wildcard = "All files (*.*) | *.*|Image files (*.jpg)|*.jpg|(*.png)|*.png|(*.tif)|*.tif|(*.tiff)|*.tiff"
+        wildcard = "All files (*.*) | *.*|(*.jpg)|*.jpg|(*.png)|*.png|(*.tif)|*.tif|(*.tiff)|*.tiff"
         openFileDialog = wx.FileDialog(self.frame, "Open", "", "", 
                                        wildcard, 
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
@@ -63,7 +63,7 @@ class TifImageViewer(wx.App):
         
 class myFrame(wx.Frame):
     def __init__(self,value,title):
-        super(myFrame,self).__init__(None,title="Tif Image Viewer")
+        super(myFrame,self).__init__(None,title=title)
         self.panel = myPanel(None,self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.panel, 1, wx.EXPAND|wx.ALL, 2)
@@ -94,29 +94,48 @@ class myPanel(wx.Panel):
         super(myPanel,self).__init__(frame)
         self.sizer = wx.GridBagSizer(5,5)
         self.filename = filename
-        
+        frame_width,frame_height = frame.GetSize()
+        self.SetSize((frame_width,frame_height))
         if(self.filename!=None):
             try:
                 extension = self.filename.split('.')[-1]
+                
                 if(extension in ['tiff','tif','TIF','TIFF']):
                     im = cv2.imread(self.filename).astype(np.uint8)
                     cv2.imwrite('temp.jpg', im)
                     self.filename = 'temp.jpg'
+                
                 self.image = wx.Image(self.filename,wx.BITMAP_TYPE_ANY)
                 
-                W,H = frame.GetSize()
-                self.SetSize((W,H))
-                IW,IH = self.image.GetSize()
-                if(IH<IW):
-                    IP = W/float(IW)
-                    self.image.Rescale(W,IH*IP)
+                image_width,image_height = self.image.GetSize()
+                image_ratio = image_height/float(image_width)
+                if(image_ratio<1):
+                    image_frame_ratio = frame_width/float(image_width)
+                    
+                    if(image_height*image_frame_ratio>frame_height):
+                        image_height = frame_height
+                        
+                    else:
+                        image_height = image_height*image_frame_ratio
+                        
+                    image_width = int(image_height/image_ratio)
+                    self.image.Rescale(image_width,image_height)
+                    
                 else:
-                    IP = H/float(IH)
-                    self.image.Rescale(IW*IP,H)
+                    image_frame_ratio = frame_height/float(image_height)
+                    
+                    if(image_width*image_frame_ratio>frame_width):
+                        image_width = frame_width
+
+                    else:
+                        image_width = image_width*image_frame_ratio
+                        
+                    image_height = int(image_width*image_ratio)
+                    self.image.Rescale(image_width,image_height)
                 
-                self.imageCtrl = wx.StaticBitmap(self, wx.ID_ANY, 
+                self.image_control = wx.StaticBitmap(self, wx.ID_ANY, 
                                              wx.Bitmap(self.image))
-                self.sizer.Add(self.imageCtrl,pos=(0,0),span=(5,5), flag=wx.EXPAND|wx.ALL, border=2)
+                self.sizer.Add(self.image_control,pos=(0,0),span=(5,5), flag=wx.EXPAND|wx.ALL, border=2)
                 self.SetSizer(self.sizer)
                 sizer = wx.BoxSizer(wx.VERTICAL)
                 sizer.Add(self, 1, wx.EXPAND|wx.ALL, 2)
@@ -124,11 +143,18 @@ class myPanel(wx.Panel):
                 
             except Exception,e:
                 print(str(e))
-        #os.remove('temp.jpg')
+        
     
         
 
 if __name__ == '__main__':
-    imageViewer = TifImageViewer()
+    imageViewer = ImageViewer()
     imageViewer.MainLoop()
+
+    #delete temporary image file if it exists
+    try:
+        os.remove('temp.jpg')
+    except:
+        pass
+    
     
