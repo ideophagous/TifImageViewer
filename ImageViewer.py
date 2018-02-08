@@ -80,10 +80,14 @@ class ImageViewerFrame(wx.Frame):
                         format is incorrect.
 
                         The application can handle the
-                        extensions jpg, jpeg, tif, tiff, or
-                        png. Other formats have not been
-                        tested and cannot be guaranteed to
-                        work.
+                        extensions jpg, jpeg, tif, tiff
+                        (8-bit and 16-bit formats), and png,
+                        with good reliability. ico and bmp
+                        files can also be viewed, but these
+                        two extensions have not been tested
+                        sufficiently. Other formats have not
+                        been tested and cannot be guaranteed
+                        to work.
                     ''')
 
     def onResize(self, event):
@@ -109,8 +113,8 @@ class myPanel(wx.Panel):
         if(self.filename is not None):
             try:
                 extension = self.filename.split('.')[-1].lower()
-                if(extension not in ['tiff','tif','jpg','jpeg','png']):
-                    wx.MessageBox("Bad file format! This applications handles only JPG, PNG and TIF images at the moment!",
+                if(extension not in ['tiff','tif','jpg','jpeg','png','ico','bmp']):
+                    wx.MessageBox("Bad file format! This application handles reliably only JPG, PNG and TIF images at the moment!",
                                   '',wx.ICON_ERROR)
 
                 elif(extension in ['tiff','tif','png']):
@@ -133,6 +137,8 @@ class myPanel(wx.Panel):
                 
             
             except Exception,e:
+                wx.MessageBox("Bad file format! This application handles reliably only JPG, PNG and TIF images at the moment!",
+                                  '',wx.ICON_ERROR)
                 print(str(e))
         
 def get_new_image_size(image_size,frame_size):
