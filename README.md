@@ -1,4 +1,4 @@
-Made by Mounir AFIFI for a job interview at Delmic, Netherlands
+Made by Maurusian
 
 Python 2.7.12
 
